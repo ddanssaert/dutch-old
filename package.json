@@ -1,0 +1,20 @@
+{
+  "name": "dutch",
+  "version": "1.0.0",
+  "description": "A card game built using Phaser.js.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "phaser": "^3.88.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.1",
+    "@capacitor/core": "^7.0.1",
+    "vite": "^6.1.0"
+  }
+}
