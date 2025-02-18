@@ -1,4 +1,4 @@
-import Game from '../objects/Game.js';
+import GameController from '../objects/GameController.js';
 
 
 export default class MainScene extends Phaser.Scene {
@@ -38,10 +38,10 @@ export default class MainScene extends Phaser.Scene {
         // Set the background color to #008080 (Teal)
         this.cameras.main.setBackgroundColor('#008080');
 
-        this.game = new Game(this);
-        await this.game.deal();
+        this.game = new GameController(this);
+        await this.game.dealCards();
         await this.game.showFirstPlayerCards();
-        
+
     }
 
     update() {
