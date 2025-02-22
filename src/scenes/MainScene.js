@@ -40,7 +40,9 @@ export default class MainScene extends Phaser.Scene {
         // Set the background color to #008080 (Teal)
         this.cameras.main.setBackgroundColor('#008080');
 
-        this.game = new LocalGameController(this);
+        this.game = new LocalGameController(this, {
+            N_PLAYERS: 2,
+        });
         await this.game.init();
     }
 
