@@ -1,22 +1,23 @@
 export const GAME_CONFIG = {
     CARD_WIDTH: 100,
     CARD_HEIGHT: 140,
+    CARD_SCALE: 0.8,
     DECK_POSITION: {
-        x: 100,
-        y: 400,
+        x: 0.4,
+        y: 0.5,
     },
     BIN_POSITION: {
-        x: 200,
-        y: 400,
+        x: 0.6,
+        y: 0.5,
     },
-    HAND_OFFSET: 50,
-    RELATIVE_HAND_POSITION: {
-        x: 100,
-        y: 100,
+    PLAYER_HAND_POSITION: {
+        x: 0.1,
+        y: 0.1,
     },
-    RELATIVE_PLAYER_TABLE_CENTER_POSITION: {
-        x: 500,
-        y: 100,
+    PLAYER_TABLE_START_POSITION: {
+        x: 0.4,
+        y: 0.1,
     },
+    PLAYER_TABLE_X_OFFSET: 0.15,
     PLAYER_TABLE_WIDTH: 400,
 };

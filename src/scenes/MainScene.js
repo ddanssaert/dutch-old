@@ -1,4 +1,4 @@
-import GameController from '../objects/GameController.js';
+import LocalGameController from '../controller/LocalGameController.js';
 
 
 export default class MainScene extends Phaser.Scene {
@@ -10,6 +10,8 @@ export default class MainScene extends Phaser.Scene {
 
     preload() {
         // Load card back image
+        this.load.image('card-highlight', '/assets/cards/card-highlight.png');
+        this.load.image('card-deck-highlight', '/assets/cards/deck-vertical-highlight.png');
         this.load.image('card-blank', '/assets/cards/blank.png');
         this.load.image('card-back', '/assets/cards/back-blue.png');
         this.load.image('card-deck-back', '/assets/cards/deck-vertical-blue.png');
@@ -17,7 +19,7 @@ export default class MainScene extends Phaser.Scene {
 
         // Load individual card images
         const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-        const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        const ranks = Array.from({ length: 13 }, (_, i) => i + 1);
 
         suits.forEach((suit) => {
             ranks.forEach((rank) => {
@@ -38,10 +40,8 @@ export default class MainScene extends Phaser.Scene {
         // Set the background color to #008080 (Teal)
         this.cameras.main.setBackgroundColor('#008080');
 
-        this.game = new GameController(this);
-        await this.game.dealCards();
-        await this.game.showFirstPlayerCards();
-
+        this.game = new LocalGameController(this);
+        await this.game.init();
     }
 
     update() {

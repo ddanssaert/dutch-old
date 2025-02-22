@@ -4,7 +4,7 @@ import MainScene from './scenes/MainScene.js';
 // Phaser game configuration
 const config = {
   type: Phaser.AUTO, // Use WebGL if available, otherwise Canvas
-  width: 800,       // Game width
+  width: 600,       // Game width
   height: 800,      // Game height
   scene: [MainScene], // Add your scenes here
   physics: {
