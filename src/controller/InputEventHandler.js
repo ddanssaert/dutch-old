@@ -31,6 +31,8 @@ export default class InputEventHandler {
         console.debug('onClickPlayerTableCard()');
         if (playerModel.playerTurnPhase === PlayerTurnPhase.SWAP_OR_DISCARD) {
             this._controller.swapHandToTable(playerModel, tableCardModel);
+        } else {
+            console.debug('Discard card from table!');
         }
     }
 

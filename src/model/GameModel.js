@@ -9,6 +9,7 @@ export default class GameModel {
         this.bin = new BinModel();
         this.players = [];
         this.currentPlayerIndex = 0;
+        this.dutchPlayerIndex = null;
     }
 
     addPlayer(player) {
@@ -30,8 +31,8 @@ export default class GameModel {
     }
 
     endPlayerTurn() {
-        /*this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.IDLE;
-        this.currentPlayerIndex[this.players.length-1? 0 : this.currentPlayerIndex+1];*/
+        this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.IDLE;
+        this.currentPlayerIndex = (this.currentPlayerIndex === this.players.length-1) ? 0 : this.currentPlayerIndex+1;
         this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.DRAW;
     }
 
@@ -103,5 +104,19 @@ export default class GameModel {
         playerModel.addCardToTable(handCardModel, index);
         playerModel.playerTurnPhase = PlayerTurnPhase.END;
         return handCardModel;
+    }
+
+    showAllCards() {
+        const playerModels = this.getPlayers();
+        for (let playerModel of playerModels) {
+            for (let i = 0; i<playerModel.getTableCardsCount(); i++) {
+                const cardModel = playerModel.getCardFromTable(i);
+                cardModel.flip();
+            }
+        }
+    }
+
+    startDutch() {
+        this.dutchPlayerIndex = this.currentPlayerIndex;
     }
 }

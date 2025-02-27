@@ -8,7 +8,7 @@ export default class DeckModel {
     constructor() {
         this.cards = suits.flatMap((suit) =>
             ranks.map((rank) => (new CardModel(
-                Math.floor(Math.random() * 1000),
+                Math.floor(Math.random() * 1000000),
                 suit,
                 rank,
                 true,

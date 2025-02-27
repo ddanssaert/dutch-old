@@ -22,6 +22,10 @@ export const GAME_CONFIG = {
             y: 0.07,
         },
         HAND_Y_OFFSET: 0.1,
+        SCORE_POSITION: {
+            x: 0.62,
+            y: 0.25,
+        },
     },
     OTHER_PLAYER: {
         SCALE: 0.6,
@@ -32,6 +36,10 @@ export const GAME_CONFIG = {
             y: 0.07,
         },
         HAND_Y_OFFSET: 0.1,
+        SCORE_POSITION: {
+            x: 0.62,
+            y: 0.25,
+        },
     },
     PLAYER_HAND_POSITION: {
         x: 0.15,

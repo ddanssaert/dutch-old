@@ -44,4 +44,19 @@ export default class PlayerView {
             y: offsetPos.y*this._scene.sys.canvas.height,
         }
     }
+
+    showScore(score) {
+        const playerConfig = this._isLocal ? GAME_CONFIG.THIS_PLAYER : GAME_CONFIG.OTHER_PLAYER;
+        const relativePos =  {
+            x: playerConfig.SCORE_POSITION.x*this._gameView.getTableMinSize(),
+            y: playerConfig.SCORE_POSITION.y*this._gameView.getTableMinSize(),
+        }
+        const {targetX, targetY, targetRotation} = this._gameView.calculateCoordinatesTransform(relativePos.x, relativePos.y, this._playerPosition);
+        console.log(targetX, targetY, targetRotation);
+        const text = this._scene.add.text(targetX, targetY, `${score}`, {
+            fontSize: '32px',
+            fill: '#fff'
+        }).setOrigin(0.5);
+        // text.rotation = targetRotation;
+    }
 }

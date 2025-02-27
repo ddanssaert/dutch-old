@@ -1,6 +1,6 @@
 import GameModel from "../model/GameModel";
-import PlayerModel from "../model/PlayerModel";
 import GameView from "../view/GameView";
+import ComputerPlayer from "./ComputerPlayer";
 
 
 export default class BaseGameController {
@@ -25,12 +25,20 @@ export default class BaseGameController {
     async onReady() {
         this._model.hideFirstPlayerCards();
         await this._view.hideFirstPlayerCards(this._model);
-        this._view.updateTurnPhase();
+        this._view.updateTurnPhase(this._model);
     }
 
     async endPlayerTurn() {
         this._model.endPlayerTurn();
         this._view.updateTurnPhase(this._model);
+        const playerIndex = this._model.currentPlayerIndex;
+        console.log(`Player index: ${playerIndex}`);
+        if (this._model.dutchPlayerIndex === playerIndex) {
+            await this.endGame();
+        } else if (playerIndex !== 0) {
+            console.log(`Computer player ${playerIndex}`);
+            await ComputerPlayer.playTurn(this, this._model.getCurrentPlayer());
+        }
     }
 
     async dealCards() {
@@ -117,6 +125,13 @@ export default class BaseGameController {
     }
 
     async onDutch() {
-        
+        this._model.startDutch();
+        await this.endPlayerTurn();
+    }
+
+    async endGame() {
+        this._model.showAllCards();
+        await this._view.showAllCards(this._model);
+        this._view.showScores(this._model);
     }
 }

@@ -33,7 +33,6 @@ export default class GameView {
         if (currentPlayerView._isLocal === true) {
             console.log('updateTurnPhase()');
             const turnPhase = currentPlayerModel.playerTurnPhase;
-            console.log(turnPhase);
             this._toolbar.setButtonEnabled('endturn', turnPhase === PlayerTurnPhase.END);
             this._toolbar.setButtonEnabled('dutch', turnPhase === PlayerTurnPhase.END);
         }
@@ -165,7 +164,15 @@ export default class GameView {
         const handPosition = this._playerViews[playerModel.id].getHandPosition(playerModel);
         this._deckView.update();
         await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]);
-        await cardView.flip(this._playerViews[playerModel.id]);
+        const playerView = this._playerViews[playerModel.id];
+        if (playerView._isLocal === true) {
+            this.flipCard(cardModel);
+        } else {
+            // this.opponentLooksAtCard(playerModel, cardModel, i);
+            const targetPos = playerView.getHandPosition();
+            targetPos.y -= playerView.getHandYOffset()*this.getTableMinSize();
+            await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
+        }
     }
 
     async drawCardFromBinToHand(cardModel, playerModel) {
@@ -252,7 +259,7 @@ export default class GameView {
     async initToolbar() {
         this._toolbar.addButton('endturn', 'checkmark', 'End turn', () => this._inputEventHandler.onClickEndturn());
         this._toolbar.setButtonEnabled('endturn', false);
-        this._toolbar.addButton('dutch', 'checkmark', 'Dutch', () => { console.log('Dutch!'); });
+        this._toolbar.addButton('dutch', 'checkmark', 'Dutch', () => this._inputEventHandler.onClickDutch());
         this._toolbar.setButtonEnabled('dutch', false);
 
     }
@@ -280,6 +287,29 @@ export default class GameView {
             const playerPosition = (playerModels.length==2 && i===1) ? PlayerPosition.TOP : i;
             let playerView = new PlayerView(this, playerPosition, i===0);
             this._playerViews[playerModel.id] = playerView;
+        }
+    }
+
+    async showAllCards(gameModel) {
+        const playerModels = gameModel.getPlayers();
+        for (let playerModel of playerModels) {
+            const playerView = this._playerViews[playerModel.id];
+            for (let i = 0; i<playerModel.getTableCardsCount(); i++) {
+                const cardModel = playerModel.getCardFromTable(i);
+                const cardView = this._cardsMap[cardModel.id];
+                cardView.flip(playerView);
+            }
+        }
+        await new Promise(resolve => setTimeout(resolve, 200)); // 2s
+    }
+
+    async showScores(gameModel) {
+        const playerModels = gameModel.getPlayers();
+        for (let playerModel of playerModels) {
+            const playerView = this._playerViews[playerModel.id];
+            const playerScore = playerModel.getScore();
+            console.log(playerScore);
+            playerView.showScore(playerScore);
         }
     }
 }
