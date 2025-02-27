@@ -55,7 +55,9 @@ export default class PlayerModel {
     getScore() {
         let score = 0;
         for (let card of this.tableCards.values()) {
-            score += card.value;
+            if (card !== null) {
+                score += card.value;
+            }
         }
         return score;
     }

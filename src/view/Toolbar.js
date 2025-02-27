@@ -74,7 +74,7 @@ export default class Toolbar {
             const y = toolbarRegion.minY + (toolbarRegion.maxY - toolbarRegion.minY) / 2;
 
             btnData.button.setPosition(x, y);
-            btnData.text.setPosition(x, y + 40); // Adjust text position below the button
+            btnData.text.setPosition(x, y + 30); // Adjust text position below the button
             index++;
         });
     }

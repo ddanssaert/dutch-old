@@ -30,7 +30,11 @@ export default class BaseGameController {
 
     async endPlayerTurn() {
         this._model.endPlayerTurn();
+        if (this._model.deck.getCardsCount() === 0) {
+            await this.endGame();
+        }
         this._view.updateTurnPhase(this._model);
+        this._view.endTurn();
         const playerIndex = this._model.currentPlayerIndex;
         console.log(`Player index: ${playerIndex}`);
         if (this._model.dutchPlayerIndex === playerIndex) {
@@ -94,8 +98,7 @@ export default class BaseGameController {
         await this._view.flipCard(cardModel);
     }
 
-    async _discardFromTable(playerModel, tableCardModel) {
-        
+    async _discardFromTable(playerModel, tableCardModel) {   
         const index = this._model.discardFromTable(playerModel, tableCardModel);
         tableCardModel.flip();
         await this._view.discardCardToBin(tableCardModel, true);
@@ -103,6 +106,11 @@ export default class BaseGameController {
         this._view._deckView.update();
         this._view.updateTurnPhase(this._model);
         return index;
+    }
+
+    async _dealCard(playerModel) {
+        const cardModel = this._model.dealCard(playerModel);
+        await this._view.dealCard(playerModel, cardModel);
     }
 
     async _moveFromHandToTable(playerModel, index) {
@@ -124,6 +132,28 @@ export default class BaseGameController {
         }
     }
 
+    async discardFromTable(playerModel, tableCardModel) {
+        console.debug('discardFromTable()');
+        const binCardModel = this._model.bin.getTopCard();
+        if (!playerModel.hasCardInHand() && binCardModel !== null) {
+            tableCardModel.flip();
+            await this._view.flipCard(tableCardModel);
+            if (tableCardModel.value === binCardModel.value) {
+                // await this._discardFromTable(playerModel, tableCardModel);
+                const index = this._model.discardFromTable(playerModel, tableCardModel, false);
+                await this._view.discardCardToBin(tableCardModel, true);
+                this._view._deckView.update();
+                this._view.updateTurnPhase(this._model);
+            } else {
+                tableCardModel.flip();
+                await this._view.flipCard(tableCardModel);
+                await this._dealCard(playerModel);
+            }
+            this._view._binView.update();
+            this._view.updateTurnPhase(this._model);
+        }
+    }
+
     async onDutch() {
         this._model.startDutch();
         await this.endPlayerTurn();
@@ -133,5 +163,11 @@ export default class BaseGameController {
         this._model.showAllCards();
         await this._view.showAllCards(this._model);
         this._view.showScores(this._model);
+    }
+
+    async swapEffect(ownCardModel, otherCardModel, otherPlayerModel) {
+        console.log('Swap cards');
+        this._model.swapCards(ownCardModel, otherCardModel, otherPlayerModel);
+        await this._view.swapCards(ownCardModel, otherCardModel, otherPlayerModel);
     }
 }

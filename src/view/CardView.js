@@ -41,6 +41,23 @@ export default class CardView extends BaseCardView {
         });
     }
 
+    moveToAbsolute(x, y, rot, scale) {
+        return new Promise((resolve) => {
+            this.scene.tweens.add({
+                targets: this,
+                duration: 500,
+                x: x,
+                y: y,
+                scaleX: scale,
+                scaleY: scale,
+                rotation: rot,
+                onComplete: () => {
+                    resolve(this);
+                }
+            });
+        });
+    }
+
     
     /**
      * Flips the card, taking into account the player's position for rotation.

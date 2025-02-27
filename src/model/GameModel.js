@@ -44,6 +44,12 @@ export default class GameModel {
         }
     }
 
+    dealCard(playerModel) {
+        const dealtCardModel = this.deck.drawCard();
+        playerModel.addCardToTable(dealtCardModel);
+        return dealtCardModel;
+    }
+
     showFirstPlayerCards() {
         for (let i=0; i<2; i++) {
             for (let player of this.players) {
@@ -91,11 +97,13 @@ export default class GameModel {
         return cardModel;
     }
 
-    discardFromTable(playerModel, tableCardModel) {
+    discardFromTable(playerModel, tableCardModel, endTurn=true) {
         const index = playerModel.getIndexFromTable(tableCardModel);
         playerModel.removeCardFromTable(index);
         this.bin.discardCard(tableCardModel);
-        playerModel.playerTurnPhase = PlayerTurnPhase.END;
+        if (endTurn === true) {
+            playerModel.playerTurnPhase = PlayerTurnPhase.END;
+        }
         return index;
     }
 
@@ -111,12 +119,21 @@ export default class GameModel {
         for (let playerModel of playerModels) {
             for (let i = 0; i<playerModel.getTableCardsCount(); i++) {
                 const cardModel = playerModel.getCardFromTable(i);
-                cardModel.flip();
+                if (cardModel !== null) {
+                    cardModel.flip();
+                }
             }
         }
     }
 
     startDutch() {
         this.dutchPlayerIndex = this.currentPlayerIndex;
+    }
+
+    swapCards(ownCardModel, otherCardModel, otherPlayerModel) {
+        const ownCardIndex = this.getCurrentPlayer().getIndexFromTable(ownCardModel);
+        const otherCardIndex = otherPlayerModel.getIndexFromTable(otherCardModel);
+        this.getCurrentPlayer().tableCards[ownCardIndex] = otherCardModel;
+        otherPlayerModel.tableCards[otherCardIndex] = ownCardModel;
     }
 }

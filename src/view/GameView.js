@@ -15,7 +15,7 @@ export default class GameView {
         this._scene = scene;
         this._model = model;
         this._cardsMap = new Map();
-        this._inputEventHandler = new InputEventHandler(controller);
+        this._inputEventHandler = new InputEventHandler(controller, this);
         this._deckView = new DeckView(model.deck, this, GAME_CONFIG.DECK_POSITION.x * this.getTableSize().width, GAME_CONFIG.DECK_POSITION.y * this.getTableSize().height);
         this._binView = new BinView(model.bin, this, GAME_CONFIG.BIN_POSITION.x * this.getTableSize().width, GAME_CONFIG.BIN_POSITION.y * this.getTableSize().height);
         // this._deckView.enableHighlight();
@@ -25,6 +25,15 @@ export default class GameView {
         this._toolbar = new Toolbar(this);
         this._toolbar.addButton('ready', 'checkmark', 'Ready', () => { this._inputEventHandler.onClickReady(); });
         this._toolbar.setButtonEnabled('ready', false);
+        this._resetSwapping();
+    }
+
+    getCardView(cardModel) {
+        return this._cardsMap[cardModel.id];
+    }
+
+    getPlayerView(playerModel) {
+        return this._playerViews[playerModel.id];
     }
 
     async updateTurnPhase(gameModel) {
@@ -87,8 +96,12 @@ export default class GameView {
      */
     calculateCoordinatesTransform(x, y, playerPosition = null, rotation = 0) {
         if (playerPosition === null || playerPosition === undefined) {
-            // If no player position is specified, orient the card upright
-            playerPosition = PlayerPosition.BOTTOM;
+            // If no player position is specified, skip transformation
+            return {
+                targetX: x,
+                targetY: y,
+                targetRotation: 0,
+            }
         }
 
         const tableSize = this.getTableSize();
@@ -170,7 +183,8 @@ export default class GameView {
         } else {
             // this.opponentLooksAtCard(playerModel, cardModel, i);
             const targetPos = playerView.getHandPosition();
-            targetPos.y -= playerView.getHandYOffset()*this.getTableMinSize();
+            targetPos.y = GAME_CONFIG.OTHER_PLAYER.TABLE_START_POSITION.y;
+            // targetPos.y -= playerView.getHandYOffset()*this.getTableMinSize();
             await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
         }
     }
@@ -185,13 +199,14 @@ export default class GameView {
 
     async discardCardToBin(cardModel, flip=false) {
         const cardView = this._cardsMap[cardModel.id];
-        await cardView.moveTo(this._binView.x, this._binView.y);
+        await cardView.moveTo(this._binView.x-this._binView._displayOriginX-3, this._binView.y);
         if (flip) {
             await cardView.flip();
         }
         this._binView.update();
         cardView.destroy();
         this._cardsMap[cardModel.id] = null;
+        this._checkBinTopCard();
     }
 
     async drawCardFromDeckToTable(cardModel, playerModel, index) {
@@ -219,6 +234,12 @@ export default class GameView {
                 await this.moveToTable(cardModel, playerModel, i);
             }
         }
+    }
+
+    async dealCard(playerModel, cardModel) {
+        const newIndex = playerModel.getIndexFromTable(cardModel);
+        const cardView = this._drawCardFromDeck(cardModel);
+        await this.moveToTable(cardModel, playerModel, newIndex);
     }
 
     async flipCard(cardModel) {
@@ -261,7 +282,8 @@ export default class GameView {
         this._toolbar.setButtonEnabled('endturn', false);
         this._toolbar.addButton('dutch', 'checkmark', 'Dutch', () => this._inputEventHandler.onClickDutch());
         this._toolbar.setButtonEnabled('dutch', false);
-
+        this._toolbar.addButton('swap', 'checkmark', 'Swap', () => this._inputEventHandler.onClickSwap());
+        this._toolbar.setButtonEnabled('swap', false);
     }
 
     async hideFirstPlayerCards(gameModel) {
@@ -296,8 +318,10 @@ export default class GameView {
             const playerView = this._playerViews[playerModel.id];
             for (let i = 0; i<playerModel.getTableCardsCount(); i++) {
                 const cardModel = playerModel.getCardFromTable(i);
-                const cardView = this._cardsMap[cardModel.id];
-                cardView.flip(playerView);
+                if (cardModel !== null) {
+                    const cardView = this._cardsMap[cardModel.id];
+                    cardView.flip(playerView);
+                }
             }
         }
         await new Promise(resolve => setTimeout(resolve, 200)); // 2s
@@ -311,5 +335,48 @@ export default class GameView {
             console.log(playerScore);
             playerView.showScore(playerScore);
         }
+    }
+
+    async _checkBinTopCard() {
+        const topCardValue = this._model.bin.getTopCard().value;
+        const playerModel = this._model.getCurrentPlayer();
+        const playerView = this._playerViews[playerModel.id];
+        if (playerView._isLocal === true) {
+            if (topCardValue == 11) {
+                // JACK
+                this._toolbar.setButtonEnabled('swap', true);
+            }
+        }
+    }
+
+    async endTurn() {
+        this._toolbar.setButtonEnabled('swap', false);
+    }
+
+    async startSwapEffect() {
+        this._isSwapping = true;
+    }
+
+    _resetSwapping() {
+        this._isSwapping = false;
+        this._ownSwapCard = null;
+        this._otherSwapCard = null;
+        this._otherSwapPlayerModel = null;
+    }
+
+    async swapCards(ownCardModel, otherCardModel, otherPlayerModel) {
+        const ownCardView = this.getCardView(ownCardModel);
+        const otherCardView = this.getCardView(otherCardModel);
+        const ownCardViewX = ownCardView.x;
+        const ownCardViewY = ownCardView.y;
+        const ownCardViewRot = ownCardView.rotation;
+        const ownCardViewScale = ownCardView.scale;
+        ownCardView.moveToAbsolute(otherCardView.x, otherCardView.y, otherCardView.rotation, otherCardView.scale);
+        await otherCardView.moveToAbsolute(ownCardViewX, ownCardViewY, ownCardViewRot, ownCardViewScale);
+        ownCardView.removeAllListeners('pointerdown');
+        otherCardView.removeAllListeners('pointerdown');
+        otherCardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(this._model.getCurrentPlayer(), otherCardModel));
+        ownCardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(otherPlayerModel, ownCardModel));
+        this._resetSwapping();
     }
 }
