@@ -19,7 +19,6 @@ export default class GameModel {
         for (let i=0; i<nPlayes; i++) {
             this.addPlayer(new PlayerModel(i));
         }
-        this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.DRAW;
     }
 
     getPlayers() {
@@ -31,8 +30,8 @@ export default class GameModel {
     }
 
     endPlayerTurn() {
-        this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.IDLE;
-        this.currentPlayerIndex[this.players.length-1? 0 : this.currentPlayerIndex+1];
+        /*this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.IDLE;
+        this.currentPlayerIndex[this.players.length-1? 0 : this.currentPlayerIndex+1];*/
         this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.DRAW;
     }
 
@@ -44,13 +43,23 @@ export default class GameModel {
         }
     }
 
-    flipFirstPlayerCards() {
+    showFirstPlayerCards() {
         for (let i=0; i<2; i++) {
             for (let player of this.players) {
                 const cardModel = player.getCardFromTable(i);
                 cardModel.flip();
             }
         }
+    }
+
+    hideFirstPlayerCards() {
+        for (let i=0; i<2; i++) {
+            for (let player of this.players) {
+                const cardModel = player.getCardFromTable(i);
+                cardModel.flip();
+            }
+        }
+        this.getCurrentPlayer().playerTurnPhase = PlayerTurnPhase.DRAW;
     }
 
     drawCardFromDeck(playerModel) {

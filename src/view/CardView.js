@@ -1,6 +1,7 @@
 import { GAME_CONFIG } from "../config";
 import BaseCardView from "./BaseCardView";
 import { getTexture } from "./Helpers";
+import PlayerPosition from "./PlayerPosition";
 
 export default class CardView extends BaseCardView {
     constructor(cardModel, gameView, x, y, isFaceDown=false) {
@@ -19,15 +20,19 @@ export default class CardView extends BaseCardView {
      * @param {number} playerPosition - The player's position (e.g., PlayerPosition.BOTTOM).
      * @returns {Promise} - Resolves when the movement is complete.
      */
-    moveTo(x, y, playerPosition = null) {
+    moveTo(x, y, playerView = null) {
         return new Promise((resolve) => {
+            const playerPosition = playerView !== null ? playerView._playerPosition : PlayerPosition.BOTTOM;
             const { targetX, targetY, targetRotation } = this.gameView.calculateCoordinatesTransform(x, y, playerPosition, this.rotation);
-            
+            const scale = playerView !== null ? playerView.getScale() : GAME_CONFIG.CARD_SCALE;
+
             this.scene.tweens.add({
                 targets: this,
                 duration: 500,
                 x: targetX,
                 y: targetY,
+                scaleX: scale,
+                scaleY: scale,
                 rotation: targetRotation,
                 onComplete: () => {
                     resolve(this);
@@ -42,11 +47,14 @@ export default class CardView extends BaseCardView {
      * @param {number} playerPosition - The player's position (e.g., PlayerPosition.BOTTOM).
      * @returns {Promise} - Resolves when the flip is complete.
      */
-    flip(playerPosition) {
+    flip(playerView=null) {
         return new Promise((resolve) => {
+            const playerPosition = playerView !== null ? playerView._playerPosition : PlayerPosition.BOTTOM;
+            const scale = playerView !== null ? playerView.getScale() : GAME_CONFIG.CARD_SCALE;
             this.scene.tweens.add({
                 targets: this,
                 scaleX: 0,
+                scaleY: scale,
                 duration: 200,
                 onComplete: () => {
                     // Toggle face-up/face-down state
@@ -63,7 +71,8 @@ export default class CardView extends BaseCardView {
 
                     this.scene.tweens.add({
                         targets: this,
-                        scaleX: GAME_CONFIG.CARD_SCALE,
+                        scaleX: scale,
+                        scaleY: scale,
                         rotation: this.rotation,
                         duration: 200,
                         onComplete: () => {

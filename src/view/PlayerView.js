@@ -22,10 +22,21 @@ export default class PlayerView {
         }
     }
 
+    getScale() {
+        const playerConfig = this._isLocal ? GAME_CONFIG.THIS_PLAYER : GAME_CONFIG.OTHER_PLAYER;
+        return playerConfig.SCALE;
+    }
+    
+    getHandYOffset() {
+        const playerConfig = this._isLocal ? GAME_CONFIG.THIS_PLAYER : GAME_CONFIG.OTHER_PLAYER;
+        return playerConfig.HAND_Y_OFFSET;
+    }
+
     getTablePosition(index) {
-        const relativePos = GAME_CONFIG.PLAYER_TABLE_START_POSITION;
+        const playerConfig = this._isLocal ? GAME_CONFIG.THIS_PLAYER : GAME_CONFIG.OTHER_PLAYER;
+        const relativePos = playerConfig.TABLE_START_POSITION;
         const offsetPos = {
-            x: relativePos.x + GAME_CONFIG.PLAYER_TABLE_X_OFFSET*index,
+            x: relativePos.x + playerConfig.TABLE_X_OFFSET*index,
             y: relativePos.y,
         };
         return {

@@ -22,8 +22,15 @@ export default class BaseGameController {
         await this._view.initPlayers(this._model);
     }
 
+    async onReady() {
+        this._model.hideFirstPlayerCards();
+        await this._view.hideFirstPlayerCards(this._model);
+        this._view.updateTurnPhase();
+    }
+
     async endPlayerTurn() {
         this._model.endPlayerTurn();
+        this._view.updateTurnPhase(this._model);
     }
 
     async dealCards() {
@@ -32,11 +39,9 @@ export default class BaseGameController {
     }
 
     async showFirstPlayerCards() {
-        this._model.flipFirstPlayerCards();
+        this._model.showFirstPlayerCards();
         await this._view.showFirstPlayerCards(this._model);
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 2s
-        this._model.flipFirstPlayerCards();
-        await this._view.hideFirstPlayerCards(this._model);
+        // await new Promise(resolve => setTimeout(resolve, 2000)); // 2s
     }
 
     async drawCardFromDeck() {
@@ -48,6 +53,7 @@ export default class BaseGameController {
                 await this._view.drawCardFromDeckToHand(cardModel, playerModel);
             }
             this._view._deckView.update();
+            this._view.updateTurnPhase(this._model);
         } else {
             console.log('Player already has a card in hand.')
         }
@@ -59,6 +65,7 @@ export default class BaseGameController {
         const cardModel = this._model.drawCardFromBin(playerModel);
         if (cardModel) {
             await this._view.drawCardFromBinToHand(cardModel, playerModel);
+            this._view.updateTurnPhase(this._model);
         }
         this._view._deckView.update();
     }
@@ -69,6 +76,7 @@ export default class BaseGameController {
         const cardModel = this._model.discardFromHand(playerModel);
         if (cardModel) {
             await this._view.discardCardToBin(cardModel);
+            this._view.updateTurnPhase(this._model);
         }
         this._view._deckView.update();
     }
@@ -85,6 +93,7 @@ export default class BaseGameController {
         await this._view.discardCardToBin(tableCardModel, true);
         // await this._flipCard(tableCardModel);
         this._view._deckView.update();
+        this._view.updateTurnPhase(this._model);
         return index;
     }
 
@@ -94,6 +103,7 @@ export default class BaseGameController {
         if (cardModel) {
             await this._view.flipCard(cardModel);
             await this._view.moveToTable(cardModel, playerModel, index);
+            this._view.updateTurnPhase(this._model);
         }
     }
 
@@ -102,10 +112,11 @@ export default class BaseGameController {
         if (handCardModel !== null && handCardModel !== undefined) {
             const index = await this._discardFromTable(playerModel, tableCardModel);
             await this._moveFromHandToTable(playerModel, index);
+            this._view.updateTurnPhase(this._model);
         }
     }
 
-    dutch(player) {
+    async onDutch() {
         
     }
 }

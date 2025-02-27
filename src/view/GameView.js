@@ -7,6 +7,8 @@ import DeckView from "./DeckView";
 import InputEventHandler from "../controller/InputEventHandler";
 import PlayerView from "./PlayerView";
 import PlayerPosition from "./PlayerPosition";
+import Toolbar from "./Toolbar";
+import PlayerTurnPhase from "../model/PlayerTurnPhase";
 
 export default class GameView {
     constructor(model, scene, controller) {
@@ -14,12 +16,66 @@ export default class GameView {
         this._model = model;
         this._cardsMap = new Map();
         this._inputEventHandler = new InputEventHandler(controller);
-        this._deckView = new DeckView(model.deck, this, GAME_CONFIG.DECK_POSITION.x * scene.sys.canvas.width, GAME_CONFIG.DECK_POSITION.y * scene.sys.canvas.height);
-        this._binView = new BinView(model.bin, this, GAME_CONFIG.BIN_POSITION.x * scene.sys.canvas.width, GAME_CONFIG.BIN_POSITION.y * scene.sys.canvas.height);
+        this._deckView = new DeckView(model.deck, this, GAME_CONFIG.DECK_POSITION.x * this.getTableSize().width, GAME_CONFIG.DECK_POSITION.y * this.getTableSize().height);
+        this._binView = new BinView(model.bin, this, GAME_CONFIG.BIN_POSITION.x * this.getTableSize().width, GAME_CONFIG.BIN_POSITION.y * this.getTableSize().height);
         // this._deckView.enableHighlight();
         // this._binView.enableHighlight();
         // this._playerView = new PlayerView(this, PlayerPosition.BOTTOM);
         this._playerViews = new Map();
+        this._toolbar = new Toolbar(this);
+        this._toolbar.addButton('ready', 'checkmark', 'Ready', () => { this._inputEventHandler.onClickReady(); });
+        this._toolbar.setButtonEnabled('ready', false);
+    }
+
+    async updateTurnPhase(gameModel) {
+        const currentPlayerModel = gameModel.getCurrentPlayer();
+        const currentPlayerView = this._playerViews[currentPlayerModel.id];
+        if (currentPlayerView._isLocal === true) {
+            console.log('updateTurnPhase()');
+            const turnPhase = currentPlayerModel.playerTurnPhase;
+            console.log(turnPhase);
+            this._toolbar.setButtonEnabled('endturn', turnPhase === PlayerTurnPhase.END);
+            this._toolbar.setButtonEnabled('dutch', turnPhase === PlayerTurnPhase.END);
+        }
+    }
+
+    getCanvasSize() {
+        const canvas = this._scene.sys.canvas;
+        return {
+            width: canvas.width,
+            height: canvas.height,
+        }
+    }
+
+    getTableSize() {
+        const canvasSize = this.getCanvasSize();
+        return {
+            width: canvasSize.width,
+            height: canvasSize.height * (1 - GAME_CONFIG.TOOLBAR_HEIGHT),
+        }
+    }
+
+    getTableMinSize() {
+        const {width, height} = this.getTableSize();
+        return Math.min(width, height);
+    }
+
+    getToolBarSize() {
+        const canvasSize = this.getCanvasSize();
+        return {
+            width: canvasSize.width,
+            height: canvasSize.height * GAME_CONFIG.TOOLBAR_HEIGHT,
+        }
+    }
+
+    getToolBarRegion() {
+        const canvasSize = this.getCanvasSize();
+        return {
+            minX: 0,
+            maxX: canvasSize.width,
+            minY: canvasSize.height * (1 - GAME_CONFIG.TOOLBAR_HEIGHT),
+            maxY: canvasSize.height,
+        }
     }
 
     /**
@@ -36,19 +92,19 @@ export default class GameView {
             playerPosition = PlayerPosition.BOTTOM;
         }
 
-        const canvas = this._scene.sys.canvas;
+        const tableSize = this.getTableSize();
         let targetX, targetY;
 
-        const minSize = Math.min(canvas.width, canvas.height);
-        const widthOffset = (canvas.width - minSize) / 2;
-        const heightOffset = (canvas.height - minSize) / 2;
+        const minSize = this.getTableMinSize();
+        const widthOffset = (tableSize.width - minSize) / 2;
+        const heightOffset = (tableSize.height - minSize) / 2;
 
         // Calculate absolute coordinates based on player position
         switch (playerPosition) {
             case PlayerPosition.BOTTOM:
                 // Bottom player: (x, y) maps to (x, y)
                 targetX = widthOffset + x;
-                targetY = canvas.height - y;
+                targetY = tableSize.height - y;
                 break;
             case PlayerPosition.LEFT:
                 // Left player: (x, y) maps to (0, H - y)
@@ -57,13 +113,13 @@ export default class GameView {
                 break;
             case PlayerPosition.TOP:
                 // Top player: (x, y) maps to (W - x, H)
-                targetX = canvas.width - widthOffset - x;
+                targetX = tableSize.width - widthOffset - x;
                 targetY = y;
                 break;
             case PlayerPosition.RIGHT:
                 // Right player: (x, y) maps to (W, y)
-                targetX = canvas.width - y;
-                targetY = canvas.height - heightOffset - x;
+                targetX = tableSize.width - y;
+                targetY = tableSize.height - heightOffset - x;
                 break;
             default:
                 // Default (no player position): (x, y) maps to (x, y)
@@ -108,8 +164,8 @@ export default class GameView {
         const cardView = this._drawCardFromDeck(cardModel);
         const handPosition = this._playerViews[playerModel.id].getHandPosition(playerModel);
         this._deckView.update();
-        await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]._playerPosition);
-        await cardView.flip();
+        await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]);
+        await cardView.flip(this._playerViews[playerModel.id]);
     }
 
     async drawCardFromBinToHand(cardModel, playerModel) {
@@ -117,7 +173,7 @@ export default class GameView {
         const cardView = this._drawCardFromBin(cardModel);
         const handPosition = this._playerViews[playerModel.id].getHandPosition(playerModel);
         this._binView.update();
-        await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]._playerPosition);
+        await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]);
     }
 
     async discardCardToBin(cardModel, flip=false) {
@@ -136,7 +192,7 @@ export default class GameView {
         const cardView = this._drawCardFromDeck(cardModel);
         const targetPos = this._playerViews[playerModel.id].getTablePosition(index);
         this._deckView.update();
-        await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]._playerPosition);
+        await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
         cardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(playerModel, cardModel));
         // await cardView.flip();
     }
@@ -144,7 +200,7 @@ export default class GameView {
     async moveToTable(cardModel, playerModel, index) {
         const cardView = this._cardsMap[cardModel.id];
         const targetPos = this._playerViews[playerModel.id].getTablePosition(index);
-        await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]._playerPosition);
+        await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
         cardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(playerModel, cardModel));
     }
 
@@ -167,15 +223,15 @@ export default class GameView {
         const playerView = this._playerViews[playerModel.id];
         const cardView = this._cardsMap[cardModel.id];
         const targetPos = playerView.getTablePosition(index);
-        targetPos.y -= 100;
-        await cardView.moveTo(targetPos.x, targetPos.y, playerView._playerPosition);
+        targetPos.y -= playerView.getHandYOffset()*this.getTableMinSize();
+        await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
     }
 
     async opponentHidesCard(playerModel, cardModel, index) {
         const playerView = this._playerViews[playerModel.id];
         const cardView = this._cardsMap[cardModel.id];
         const targetPos = playerView.getTablePosition(index);
-        await cardView.moveTo(targetPos.x, targetPos.y, playerView._playerPosition);
+        await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
     }
 
     async showFirstPlayerCards(gameModel) {
@@ -190,6 +246,15 @@ export default class GameView {
                 }
             }
         }
+        this._toolbar.setButtonEnabled('ready', true);
+    }
+
+    async initToolbar() {
+        this._toolbar.addButton('endturn', 'checkmark', 'End turn', () => this._inputEventHandler.onClickEndturn());
+        this._toolbar.setButtonEnabled('endturn', false);
+        this._toolbar.addButton('dutch', 'checkmark', 'Dutch', () => { console.log('Dutch!'); });
+        this._toolbar.setButtonEnabled('dutch', false);
+
     }
 
     async hideFirstPlayerCards(gameModel) {
@@ -204,6 +269,8 @@ export default class GameView {
                 }
             }
         }
+        this._toolbar.removeButton('ready');
+        this.initToolbar();
     }
 
     async initPlayers(gameModel) {
