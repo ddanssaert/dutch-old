@@ -4,7 +4,6 @@ export const GAME_CONFIG = {
     CARD_WIDTH: 100,
     CARD_HEIGHT: 140,
     CARD_SCALE: 0.6,
-    TOOLBAR_HEIGHT: 0.12,
     DECK_POSITION: {
         x: 0.42,
         y: 0.5,
@@ -45,4 +44,12 @@ export const GAME_CONFIG = {
         x: 0.07,
         y: 0.04,
     },
+    TOOLBAR: {
+        RELATIVE_HEIGHT: 0.2,
+        MAX_HEIGHT: 100,
+        RELATIVE_X_PADDING: 0.25,
+        MAX_X_PADDING: 25,
+        RELATIVE_Y_PADDING: 0.20,
+        MAX_Y_PADDING: 20,
+    }
 };

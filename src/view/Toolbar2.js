@@ -1,13 +1,14 @@
+import { GAME_CONFIG } from "../config";
 import Button from "./Button";
 
 export default class Toolbar extends Phaser.GameObjects.Container {
-    constructor(gameView, position, size) {
-        super(gameView._scene, position.x, position.y);
-        this.setSize(size.width, size.height);
-        gameView._scene.add.existing(this);
+    constructor(gameView, displaySize) {
+        super(gameView._scene);
+        this._displaySize = displaySize;
         this._gameView = gameView;
         this.createToolbar();
-        this.updateLayout(position, size);
+        this.updateLayout(displaySize);
+        gameView._scene.add.existing(this);
     }
 
     createToolbar() {
@@ -23,8 +24,8 @@ export default class Toolbar extends Phaser.GameObjects.Container {
     }
 
     update() {
-        const xPadding = 25;
-        const yPadding = 20;
+        const xPadding = Math.max(GAME_CONFIG.TOOLBAR.MAX_X_PADDING, GAME_CONFIG.TOOLBAR.RELATIVE_X_PADDING*this.height);
+        const yPadding = Math.max(GAME_CONFIG.TOOLBAR.MAX_Y_PADDING, GAME_CONFIG.TOOLBAR.RELATIVE_Y_PADDING*this.height);
         const buttonSize = this.height - yPadding*2;
         const visibleButtons = this.getAll('visible', true);
         const buttonCount = visibleButtons.length;
@@ -41,9 +42,11 @@ export default class Toolbar extends Phaser.GameObjects.Container {
         }
     }
 
-    updateLayout(position, size) {
-        this.setPosition(position.x, position.y);
-        this.setSize(size.width, size.height);
+    updateLayout(displaySize) {
+        this._displaySize = displaySize;
+        const toolbarHeight = Math.min(GAME_CONFIG.TOOLBAR.MAX_HEIGHT, GAME_CONFIG.TOOLBAR.RELATIVE_HEIGHT*displaySize.height);
+        this.setPosition(displaySize.width/2, displaySize.height - toolbarHeight/2);
+        this.setSize(displaySize.width, toolbarHeight);
         this.update();
     }
 }

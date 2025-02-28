@@ -20,12 +20,8 @@ export default class GameView {
         this._binView = new BinView(model.bin, this, GAME_CONFIG.BIN_POSITION.x * this.getTableSize().width, GAME_CONFIG.BIN_POSITION.y * this.getTableSize().height);
         // this._deckView.enableHighlight();
         // this._binView.enableHighlight();
-        // this._playerView = new PlayerView(this, PlayerPosition.BOTTOM);
         this._playerViews = new Map();
-        const displaySize = this._scene.scale.displaySize;
-        const toolbarHeight = 90;
-        this._toolbar = new Toolbar(this, {x: displaySize.width/2, y: displaySize.height - toolbarHeight/2}, {width: displaySize.width, height: toolbarHeight});
-        //this._toolbar.addButton('ready', 'button_ready', 'Ready', () => { this._inputEventHandler.onClickReady(); });
+        this._toolbar = new Toolbar(this, this.getDisplaySize());
         this._resetSwapping();
         
     }
@@ -388,7 +384,10 @@ export default class GameView {
 
     /* REFACTOR */
     update(displaySize) {
-        const toolbarHeight = 90;
-        this._toolbar.updateLayout({x: displaySize.width/2, y: displaySize.height - toolbarHeight/2}, {width: displaySize.width, height: toolbarHeight});
+        this._toolbar.updateLayout(displaySize);
+    }
+
+    getDisplaySize() {
+        return this._scene.scale.displaySize;
     }
 }
