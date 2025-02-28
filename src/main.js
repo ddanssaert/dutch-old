@@ -5,8 +5,8 @@ import { GAME_CONFIG } from './config.js';
 // Phaser game configuration
 const config = {
   type: Phaser.AUTO, // Use WebGL if available, otherwise Canvas
-  width: GAME_CONFIG.CANVAS_WIDTH,       // Game width
-  height: GAME_CONFIG.CANVAS_HEIGHT,      // Game height
+  width: window.innerWidth,
+  height: window.innerHeight,
   scene: [MainScene], // Add your scenes here
   physics: {
     default: 'arcade', // Use the Arcade Physics engine
@@ -15,7 +15,17 @@ const config = {
       debug: false,      // Set to true to see physics debug overlay
     },
   },
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    zoom: 1,
+  }
 };
 
 // Create the Phaser game instance
 const game = new Phaser.Game(config);
+
+// Handle window resizing
+window.addEventListener('resize', () => {
+  game.scale.resize(window.innerWidth, window.innerHeight);
+});
