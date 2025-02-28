@@ -29,8 +29,10 @@ export default class Toolbar {
 
     addButton(name, imageKey, text, onClick) {
         const button = this.scene.add.sprite(0, 0, imageKey).setInteractive();
+        const scale = 64 / button.width;
+        button.setScale(scale);
         const buttonText = this.scene.add.text(0, 0, text, {
-            fontSize: '16px',
+            fontSize: '14px',
             fill: '#fff'
         }).setOrigin(0.5);
 
@@ -74,7 +76,7 @@ export default class Toolbar {
             const y = toolbarRegion.minY + (toolbarRegion.maxY - toolbarRegion.minY) / 2;
 
             btnData.button.setPosition(x, y);
-            btnData.text.setPosition(x, y + 30); // Adjust text position below the button
+            btnData.text.setPosition(x, y + 18); // Adjust text position below the button
             index++;
         });
     }

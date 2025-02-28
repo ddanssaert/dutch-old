@@ -10,12 +10,14 @@ export default class MainScene extends Phaser.Scene {
 
     preload() {
         // Load card back image
+        this.load.image('card-bin', '/assets/cards/card-bin2.png');
         this.load.image('card-highlight', '/assets/cards/card-highlight.png');
         this.load.image('card-deck-highlight', '/assets/cards/deck-vertical-highlight.png');
         this.load.image('card-blank', '/assets/cards/blank.png');
         this.load.image('card-back', '/assets/cards/back-blue.png');
         this.load.image('card-deck-back', '/assets/cards/deck-vertical-blue.png');
         this.load.image('card-deck', '/assets/cards/deck-vertical-blank.png');
+        
 
         // Load individual card images
         const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
@@ -29,7 +31,10 @@ export default class MainScene extends Phaser.Scene {
         });
 
         // tests
-        this.load.image('checkmark', '/assets/checkmark.png');
+        this.load.image('button_ready', '/assets/buttons/button_ready.png');
+        this.load.image('button_endturn', '/assets/buttons/button_endturn.png');
+        this.load.image('button_dutch', '/assets/buttons/button_dutch.png');
+        this.load.image('button_swap', '/assets/buttons/button_swap.png');
 
         // Load sounds
         // this.load.audio('deal-card', '/assets/sounds/deal-card.mp3');

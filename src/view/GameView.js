@@ -23,7 +23,7 @@ export default class GameView {
         // this._playerView = new PlayerView(this, PlayerPosition.BOTTOM);
         this._playerViews = new Map();
         this._toolbar = new Toolbar(this);
-        this._toolbar.addButton('ready', 'checkmark', 'Ready', () => { this._inputEventHandler.onClickReady(); });
+        this._toolbar.addButton('ready', 'button_ready', 'Ready', () => { this._inputEventHandler.onClickReady(); });
         this._toolbar.setButtonEnabled('ready', false);
         this._resetSwapping();
     }
@@ -278,11 +278,11 @@ export default class GameView {
     }
 
     async initToolbar() {
-        this._toolbar.addButton('endturn', 'checkmark', 'End turn', () => this._inputEventHandler.onClickEndturn());
+        this._toolbar.addButton('endturn', 'button_endturn', 'Next', () => this._inputEventHandler.onClickEndturn());
         this._toolbar.setButtonEnabled('endturn', false);
-        this._toolbar.addButton('dutch', 'checkmark', 'Dutch', () => this._inputEventHandler.onClickDutch());
+        this._toolbar.addButton('dutch', 'button_dutch', 'Dutch', () => this._inputEventHandler.onClickDutch());
         this._toolbar.setButtonEnabled('dutch', false);
-        this._toolbar.addButton('swap', 'checkmark', 'Swap', () => this._inputEventHandler.onClickSwap());
+        this._toolbar.addButton('swap', 'button_swap', 'Swap', () => this._inputEventHandler.onClickSwap());
         this._toolbar.setButtonEnabled('swap', false);
     }
 
@@ -378,5 +378,10 @@ export default class GameView {
         otherCardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(this._model.getCurrentPlayer(), otherCardModel));
         ownCardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(otherPlayerModel, ownCardModel));
         this._resetSwapping();
+    }
+
+    /* REFACTOR */
+    update(displaySize) {
+        
     }
 }
