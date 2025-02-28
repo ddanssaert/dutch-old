@@ -22,7 +22,7 @@ export default class BaseCardView extends Phaser.GameObjects.Sprite {
         this.highlightImage = null;
     }
 
-    update() {
+    updateLayout() {
         if (this.deckModel.getCardsCount() == 0) {
             this.setTexture('card-blank');
         }

@@ -16,7 +16,7 @@ export default class DeckView extends BaseCardView {
         this.highlightImage.setTexture('card-deck-highlight');
     }
 
-    update() {
+    updateLayout() {
         if (this.deckModel.getCardsCount() == 0) {
             this.setTexture('card-blank');
         }

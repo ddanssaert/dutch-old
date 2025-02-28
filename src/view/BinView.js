@@ -10,7 +10,7 @@ export default class BinView extends BaseCardView {
         this.on('pointerdown', () => gameView._inputEventHandler.onClickBin());
     }
 
-    update() {
+    updateLayout() {
         const cardModel = this.binModel.getTopCard();
         if (cardModel !== null) {
             const texture = getTexture(cardModel);

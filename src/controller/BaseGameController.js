@@ -64,7 +64,7 @@ export default class BaseGameController {
             if (cardModel) {
                 await this._view.drawCardFromDeckToHand(cardModel, playerModel);
             }
-            this._view._deckView.update();
+            this._view._deckView.updateLayout();
             this._view.updateTurnPhase(this._model);
         } else {
             console.log('Player already has a card in hand.')
@@ -79,7 +79,7 @@ export default class BaseGameController {
             await this._view.drawCardFromBinToHand(cardModel, playerModel);
             this._view.updateTurnPhase(this._model);
         }
-        this._view._deckView.update();
+        this._view._deckView.updateLayout();
     }
 
     async discardFromHand() {
@@ -90,7 +90,7 @@ export default class BaseGameController {
             await this._view.discardCardToBin(cardModel);
             this._view.updateTurnPhase(this._model);
         }
-        this._view._deckView.update();
+        this._view._deckView.updateLayout();
     }
 
     async _flipCard(cardModel) {
@@ -103,7 +103,7 @@ export default class BaseGameController {
         tableCardModel.flip();
         await this._view.discardCardToBin(tableCardModel, true);
         // await this._flipCard(tableCardModel);
-        this._view._deckView.update();
+        this._view._deckView.updateLayout();
         this._view.updateTurnPhase(this._model);
         return index;
     }
@@ -142,14 +142,14 @@ export default class BaseGameController {
                 // await this._discardFromTable(playerModel, tableCardModel);
                 const index = this._model.discardFromTable(playerModel, tableCardModel, false);
                 await this._view.discardCardToBin(tableCardModel, true);
-                this._view._deckView.update();
+                this._view._deckView.updateLayout();
                 this._view.updateTurnPhase(this._model);
             } else {
                 tableCardModel.flip();
                 await this._view.flipCard(tableCardModel);
                 await this._dealCard(playerModel);
             }
-            this._view._binView.update();
+            this._view._binView.updateLayout();
             this._view.updateTurnPhase(this._model);
         }
     }

@@ -7,7 +7,7 @@ import DeckView from "./DeckView";
 import InputEventHandler from "../controller/InputEventHandler";
 import PlayerView from "./PlayerView";
 import PlayerPosition from "./PlayerPosition";
-import Toolbar from "./Toolbar";
+import Toolbar from "./Toolbar2";
 import PlayerTurnPhase from "../model/PlayerTurnPhase";
 
 export default class GameView {
@@ -22,10 +22,12 @@ export default class GameView {
         // this._binView.enableHighlight();
         // this._playerView = new PlayerView(this, PlayerPosition.BOTTOM);
         this._playerViews = new Map();
-        this._toolbar = new Toolbar(this);
-        this._toolbar.addButton('ready', 'button_ready', 'Ready', () => { this._inputEventHandler.onClickReady(); });
-        this._toolbar.setButtonEnabled('ready', false);
+        const displaySize = this._scene.scale.displaySize;
+        const toolbarHeight = 90;
+        this._toolbar = new Toolbar(this, {x: displaySize.width/2, y: displaySize.height - toolbarHeight/2}, {width: displaySize.width, height: toolbarHeight});
+        //this._toolbar.addButton('ready', 'button_ready', 'Ready', () => { this._inputEventHandler.onClickReady(); });
         this._resetSwapping();
+        
     }
 
     getCardView(cardModel) {
@@ -42,8 +44,10 @@ export default class GameView {
         if (currentPlayerView._isLocal === true) {
             console.log('updateTurnPhase()');
             const turnPhase = currentPlayerModel.playerTurnPhase;
-            this._toolbar.setButtonEnabled('endturn', turnPhase === PlayerTurnPhase.END);
-            this._toolbar.setButtonEnabled('dutch', turnPhase === PlayerTurnPhase.END);
+            // this._toolbar.setButtonEnabled('endturn', turnPhase === PlayerTurnPhase.END);
+            // this._toolbar.setButtonEnabled('dutch', turnPhase === PlayerTurnPhase.END);
+            this._toolbar.buttons.endturn._setEnabledState(turnPhase === PlayerTurnPhase.END);
+            this._toolbar.buttons.dutch._setEnabledState(turnPhase === PlayerTurnPhase.END);
         }
     }
 
@@ -175,7 +179,7 @@ export default class GameView {
         console.debug('drawCardFromDeckToHand()');
         const cardView = this._drawCardFromDeck(cardModel);
         const handPosition = this._playerViews[playerModel.id].getHandPosition(playerModel);
-        this._deckView.update();
+        this._deckView.updateLayout();
         await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]);
         const playerView = this._playerViews[playerModel.id];
         if (playerView._isLocal === true) {
@@ -193,7 +197,7 @@ export default class GameView {
         console.debug('drawCardFromBinToHand()');
         const cardView = this._drawCardFromBin(cardModel);
         const handPosition = this._playerViews[playerModel.id].getHandPosition(playerModel);
-        this._binView.update();
+        this._binView.updateLayout();
         await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]);
     }
 
@@ -203,7 +207,7 @@ export default class GameView {
         if (flip) {
             await cardView.flip();
         }
-        this._binView.update();
+        this._binView.updateLayout();
         cardView.destroy();
         this._cardsMap[cardModel.id] = null;
         this._checkBinTopCard();
@@ -213,7 +217,7 @@ export default class GameView {
         console.debug('drawCardFromDeckToHand()');
         const cardView = this._drawCardFromDeck(cardModel);
         const targetPos = this._playerViews[playerModel.id].getTablePosition(index);
-        this._deckView.update();
+        this._deckView.updateLayout();
         await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
         cardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(playerModel, cardModel));
         // await cardView.flip();
@@ -274,16 +278,16 @@ export default class GameView {
                 }
             }
         }
-        this._toolbar.setButtonEnabled('ready', true);
+        // this._toolbar.setButtonEnabled('ready', true);
+        this._toolbar.buttons.ready.enable();
     }
 
     async initToolbar() {
-        this._toolbar.addButton('endturn', 'button_endturn', 'Next', () => this._inputEventHandler.onClickEndturn());
-        this._toolbar.setButtonEnabled('endturn', false);
-        this._toolbar.addButton('dutch', 'button_dutch', 'Dutch', () => this._inputEventHandler.onClickDutch());
-        this._toolbar.setButtonEnabled('dutch', false);
-        this._toolbar.addButton('swap', 'button_swap', 'Swap', () => this._inputEventHandler.onClickSwap());
-        this._toolbar.setButtonEnabled('swap', false);
+        this._toolbar.buttons.ready.hide();
+        this._toolbar.buttons.endturn.show();
+        this._toolbar.buttons.dutch.show();
+        this._toolbar.buttons.swap.show();
+        this._toolbar.update();
     }
 
     async hideFirstPlayerCards(gameModel) {
@@ -298,7 +302,7 @@ export default class GameView {
                 }
             }
         }
-        this._toolbar.removeButton('ready');
+        // this._toolbar.removeButton('ready');
         this.initToolbar();
     }
 
@@ -344,13 +348,15 @@ export default class GameView {
         if (playerView._isLocal === true) {
             if (topCardValue == 11) {
                 // JACK
-                this._toolbar.setButtonEnabled('swap', true);
+                // this._toolbar.setButtonEnabled('swap', true);
+                this._toolbar.buttons.swap.enable();
             }
         }
     }
 
     async endTurn() {
-        this._toolbar.setButtonEnabled('swap', false);
+        // this._toolbar.setButtonEnabled('swap', false);
+        this._toolbar.buttons.swap.disable();
     }
 
     async startSwapEffect() {
@@ -382,6 +388,7 @@ export default class GameView {
 
     /* REFACTOR */
     update(displaySize) {
-        
+        const toolbarHeight = 90;
+        this._toolbar.updateLayout({x: displaySize.width/2, y: displaySize.height - toolbarHeight/2}, {width: displaySize.width, height: toolbarHeight});
     }
 }
