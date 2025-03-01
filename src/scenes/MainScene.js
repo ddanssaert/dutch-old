@@ -53,8 +53,6 @@ export default class MainScene extends Phaser.Scene {
         });
 
         this.scale.on('resize', function(gameSize, baseSize, displaySize, previousWidth, previousHeight) {
-            console.log(gameSize, baseSize, displaySize, previousWidth, previousHeight);
-            console.log(this.game);
             gameController._view.update(displaySize);
         });
 

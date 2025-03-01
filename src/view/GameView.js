@@ -266,11 +266,11 @@ export default class GameView {
         for (let i=0; i<2; i++) {
             for (let playerModel of gameModel.players) {
                 const playerView = this._playerViews[playerModel.id];
-                const cardModel = playerModel.getCardFromTable(i);
+                const cardModel = playerModel.getCardFromTable(i*2);
                 if (playerView._isLocal === true) {
                     this.flipCard(cardModel);
                 } else {
-                    this.opponentLooksAtCard(playerModel, cardModel, i);
+                    this.opponentLooksAtCard(playerModel, cardModel, i*2);
                 }
             }
         }
@@ -290,11 +290,11 @@ export default class GameView {
         for (let i=0; i<2; i++) {
             for (let playerModel of gameModel.players) {
                 const playerView = this._playerViews[playerModel.id];
-                const cardModel = playerModel.getCardFromTable(i);
+                const cardModel = playerModel.getCardFromTable(i*2);
                 if (playerView._isLocal === true) {
                     this.flipCard(cardModel);
                 } else {
-                    this.opponentHidesCard(playerModel, cardModel, i);
+                    this.opponentHidesCard(playerModel, cardModel, i*2);
                 }
             }
         }
@@ -307,7 +307,7 @@ export default class GameView {
         for (let i=0; i<playerModels.length; i++) {
             const playerModel = playerModels[i];
             const playerPosition = (playerModels.length==2 && i===1) ? PlayerPosition.TOP : i;
-            let playerView = new PlayerView(this, playerPosition, i===0);
+            let playerView = new PlayerView(this, playerPosition, this.getDisplaySize(), i===0);
             this._playerViews[playerModel.id] = playerView;
         }
     }
@@ -383,13 +383,20 @@ export default class GameView {
     }
 
     /* REFACTOR */
-    update(displaySize) {
-        this._toolbar.updateLayout(displaySize);
-        this._deckView.updateLayout(displaySize);
-        this._binView.updateLayout(displaySize);
-    }
-
     getDisplaySize() {
         return this._scene.scale.displaySize;
+    }
+
+    update(displaySize) {
+        this._toolbar.updateLayout(displaySize);
+        const tableSize = {
+            width: displaySize.width,
+            height: displaySize.height - this._toolbar.height,
+        }
+        this._deckView.updateLayout(tableSize);
+        this._binView.updateLayout(tableSize);
+        for (let playerView of this._playerViews.values()) {
+            playerView.updateLayout(tableSize);
+        }
     }
 }

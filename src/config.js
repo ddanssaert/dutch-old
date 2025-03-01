@@ -16,7 +16,7 @@ export const GAME_CONFIG = {
     THIS_PLAYER: {
         SCALE: 0.6,
         TABLE_X_OFFSET: 0.15,
-        TABLE_Y_OFFSET: 0.2,
+        TABLE_Y_OFFSET: 0.1,
         TABLE_START_POSITION: {
             x: 0.30,
             y: 0.04,
@@ -24,13 +24,13 @@ export const GAME_CONFIG = {
         HAND_Y_OFFSET: 0.08,
         SCORE_POSITION: {
             x: 0.5,
-            y: 0.30,
+            y: 0.5,
         },
     },
     OTHER_PLAYER: {
         SCALE: 0.6,
         TABLE_X_OFFSET: 0.15,
-        TABLE_Y_OFFSET: 0.2,
+        TABLE_Y_OFFSET: 0.1,
         TABLE_START_POSITION: {
             x: 0.30,
             y: 0.07,
@@ -38,7 +38,7 @@ export const GAME_CONFIG = {
         HAND_Y_OFFSET: 0.08,
         SCORE_POSITION: {
             x: 0.5,
-            y: 0.35,
+            y: 0.55,
         },
     },
     PLAYER_HAND_POSITION: {
@@ -56,7 +56,8 @@ export const GAME_CONFIG = {
     DECKS: {
         MAX_HEIGHT: 140,
         RELATIVE_HEIGHT: 0.1,
-        RELATIVE_X_PADDING: 0.20,
+        RELATIVE_X_PADDING: 0.7,
         MAX_X_PADDING: 100,
+        RELATIVE_Y: 0.5,
     },
 };

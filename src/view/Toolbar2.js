@@ -30,14 +30,11 @@ export default class Toolbar extends Phaser.GameObjects.Container {
         const visibleButtons = this.getAll('visible', true);
         const buttonCount = visibleButtons.length;
         const toolbarWidth = buttonSize*buttonCount + xPadding*(buttonCount-1);
-        console.log(buttonSize);
-        console.log(toolbarWidth);
         const xOffset = toolbarWidth / buttonCount;
         for (let i=0; i<buttonCount; ++i) {
             const button = visibleButtons[i];
             button.updateScale(buttonSize);
             button.x = -toolbarWidth/2 + buttonSize/2 + xOffset*i;
-            console.log(button.x);
             button.y = 0;
         }
     }

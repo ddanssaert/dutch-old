@@ -26,11 +26,10 @@ export default class BinView extends BaseCardView {
 
     updateLayout(displaySize) {
         const cardHeight = Math.min(GAME_CONFIG.DECKS.MAX_HEIGHT, GAME_CONFIG.DECKS.RELATIVE_HEIGHT*displaySize.height);
-        const scale = cardHeight/GAME_CONFIG.DECKS.MAX_HEIGHT;
         this.setScale(cardHeight/GAME_CONFIG.DECKS.MAX_HEIGHT);
 
-        const xPadding = Math.min(GAME_CONFIG.DECKS.MAX_X_PADDING, GAME_CONFIG.DECKS.RELATIVE_X_PADDING*displaySize.width);
+        const xPadding = Math.min(GAME_CONFIG.DECKS.MAX_X_PADDING, GAME_CONFIG.DECKS.RELATIVE_X_PADDING*this.width);
         this.x = (displaySize.width + xPadding)/2;
-        this.y = displaySize.height/2;
+        this.y = displaySize.height*GAME_CONFIG.DECKS.RELATIVE_Y;
     }
 }

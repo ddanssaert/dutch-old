@@ -2,17 +2,12 @@ import { GAME_CONFIG } from "../config";
 import PlayerPosition from "./PlayerPosition";
 
 export default class PlayerView {
-    constructor(gameView, playerPosition=PlayerPosition.BOTTOM, isLocal=false) {
+    constructor(gameView, playerPosition=PlayerPosition.BOTTOM, displaySize, isLocal=false) {
         this._gameView = gameView;
         this._scene = gameView._scene;
         this._playerPosition = playerPosition;
         this._isLocal = isLocal;
-
-        const handPosition = this.getHandPosition();
-        const absoluteHandPosition = gameView.calculateCoordinatesTransform(handPosition.x, handPosition.y, this._playerPosition);
-        //const handImage = this._scene.add.image(absoluteHandPosition.targetX, absoluteHandPosition.targetY, 'card-highlight');
-        //handImage.rotation = absoluteHandPosition.targetRotation;
-        //handImage.scale = GAME_CONFIG.CARD_SCALE;
+        this.updateLayout(displaySize);
     }
 
     getHandPosition() {
@@ -36,8 +31,8 @@ export default class PlayerView {
         const playerConfig = this._isLocal ? GAME_CONFIG.THIS_PLAYER : GAME_CONFIG.OTHER_PLAYER;
         const relativePos = playerConfig.TABLE_START_POSITION;
         const offsetPos = {
-            x: relativePos.x + playerConfig.TABLE_X_OFFSET*index,
-            y: relativePos.y,
+            x: relativePos.x + playerConfig.TABLE_X_OFFSET * Math.floor(index/2),
+            y: relativePos.y + playerConfig.TABLE_Y_OFFSET * (index%2),
         };
         return {
             x: offsetPos.x*this._scene.sys.canvas.width,
@@ -58,5 +53,15 @@ export default class PlayerView {
             fill: '#fff'
         }).setOrigin(0.5);
         // text.rotation = targetRotation;
+    }
+
+    updateLayout(displaySize) {
+        const minSize = Math.min(displaySize.width, displaySize.height);
+        const maxSize = Math.max(displaySize.width, displaySize.height);
+        const finalSize = (maxSize - 2*minSize);
+        console.log(minSize, maxSize, finalSize);
+        this.playerRegion = {
+            minX: 0,
+        };
     }
 }

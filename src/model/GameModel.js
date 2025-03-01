@@ -53,7 +53,7 @@ export default class GameModel {
     showFirstPlayerCards() {
         for (let i=0; i<2; i++) {
             for (let player of this.players) {
-                const cardModel = player.getCardFromTable(i);
+                const cardModel = player.getCardFromTable(i*2);
                 cardModel.flip();
             }
         }
@@ -62,7 +62,7 @@ export default class GameModel {
     hideFirstPlayerCards() {
         for (let i=0; i<2; i++) {
             for (let player of this.players) {
-                const cardModel = player.getCardFromTable(i);
+                const cardModel = player.getCardFromTable(i*2);
                 cardModel.flip();
             }
         }
