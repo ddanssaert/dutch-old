@@ -16,8 +16,8 @@ export default class GameView {
         this._model = model;
         this._cardsMap = new Map();
         this._inputEventHandler = new InputEventHandler(controller, this);
-        this._deckView = new DeckView(model.deck, this, GAME_CONFIG.DECK_POSITION.x * this.getTableSize().width, GAME_CONFIG.DECK_POSITION.y * this.getTableSize().height);
-        this._binView = new BinView(model.bin, this, GAME_CONFIG.BIN_POSITION.x * this.getTableSize().width, GAME_CONFIG.BIN_POSITION.y * this.getTableSize().height);
+        this._deckView = new DeckView(model.deck, this, this.getDisplaySize());
+        this._binView = new BinView(model.bin, this, this.getDisplaySize());
         // this._deckView.enableHighlight();
         // this._binView.enableHighlight();
         this._playerViews = new Map();
@@ -175,7 +175,7 @@ export default class GameView {
         console.debug('drawCardFromDeckToHand()');
         const cardView = this._drawCardFromDeck(cardModel);
         const handPosition = this._playerViews[playerModel.id].getHandPosition(playerModel);
-        this._deckView.updateLayout();
+        this._deckView.updateTexture();
         await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]);
         const playerView = this._playerViews[playerModel.id];
         if (playerView._isLocal === true) {
@@ -193,7 +193,7 @@ export default class GameView {
         console.debug('drawCardFromBinToHand()');
         const cardView = this._drawCardFromBin(cardModel);
         const handPosition = this._playerViews[playerModel.id].getHandPosition(playerModel);
-        this._binView.updateLayout();
+        this._binView.updateTexture();
         await cardView.moveTo(handPosition.x, handPosition.y, this._playerViews[playerModel.id]);
     }
 
@@ -203,7 +203,7 @@ export default class GameView {
         if (flip) {
             await cardView.flip();
         }
-        this._binView.updateLayout();
+        this._binView.updateTexture();
         cardView.destroy();
         this._cardsMap[cardModel.id] = null;
         this._checkBinTopCard();
@@ -213,7 +213,7 @@ export default class GameView {
         console.debug('drawCardFromDeckToHand()');
         const cardView = this._drawCardFromDeck(cardModel);
         const targetPos = this._playerViews[playerModel.id].getTablePosition(index);
-        this._deckView.updateLayout();
+        this._deckView.updateTexture();
         await cardView.moveTo(targetPos.x, targetPos.y, this._playerViews[playerModel.id]);
         cardView.on('pointerdown', () => this._inputEventHandler.onClickPlayerTableCard(playerModel, cardModel));
         // await cardView.flip();
@@ -385,6 +385,8 @@ export default class GameView {
     /* REFACTOR */
     update(displaySize) {
         this._toolbar.updateLayout(displaySize);
+        this._deckView.updateLayout(displaySize);
+        this._binView.updateLayout(displaySize);
     }
 
     getDisplaySize() {
