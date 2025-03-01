@@ -56,7 +56,7 @@ export const GAME_CONFIG = {
     DECKS: {
         MAX_HEIGHT: 140,
         RELATIVE_HEIGHT: 0.1,
-        RELATIVE_X_PADDING: 0.15,
+        RELATIVE_X_PADDING: 0.20,
         MAX_X_PADDING: 100,
     },
 };

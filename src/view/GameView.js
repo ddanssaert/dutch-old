@@ -199,7 +199,7 @@ export default class GameView {
 
     async discardCardToBin(cardModel, flip=false) {
         const cardView = this._cardsMap[cardModel.id];
-        await cardView.moveTo(this._binView.x /*-this._binView._displayOriginX-3*/, this._binView.y);
+        await cardView.moveToAbsolute(this._binView.x /*-this._binView._displayOriginX-3*/, this._binView.y, 0, this._binView.scale);
         if (flip) {
             await cardView.flip();
         }
